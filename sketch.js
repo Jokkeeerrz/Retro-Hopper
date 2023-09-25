@@ -10,9 +10,9 @@ PoseNet using p5.js
 /* eslint-disable */
 
 // Grab elements, create settings, etc.
-var video = document.getElementById("video");
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
 
 // The detected positions will be inside an array
 let poses = [];
@@ -47,6 +47,8 @@ poseNet.on("pose", gotPoses);
 // A function that gets called every time there's an update from the model
 function gotPoses(results) {
   poses = results;
+
+  // console.log(poses);   // DISABLE to improve performance
 }
 
 function modelReady() {
@@ -63,6 +65,7 @@ function drawKeypoints() {
       let keypoint = poses[i].pose.keypoints[j];
       // Only draw an ellipse is the pose probability is bigger than 0.2
       if (keypoint.score > 0.2) {
+        ctx.strokeStyle = "blue"; // You can use any valid CSS color here
         ctx.beginPath();
         ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
         ctx.stroke();
@@ -79,6 +82,7 @@ function drawSkeleton() {
     for (let j = 0; j < poses[i].skeleton.length; j += 1) {
       let partA = poses[i].skeleton[j][0];
       let partB = poses[i].skeleton[j][1];
+      ctx.strokeStyle = "yellow"; // You can use any valid CSS color here
       ctx.beginPath();
       ctx.moveTo(partA.position.x, partA.position.y);
       ctx.lineTo(partB.position.x, partB.position.y);
