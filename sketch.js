@@ -33,8 +33,10 @@ function drawCameraIntoCanvas() {
   // Draw the video element into the canvas
   ctx.drawImage(video, 0, 0, 640, 480);
   // We can call both functions to draw all keypoints and the skeletons
-  drawKeypoints();
-  drawSkeleton();
+  // drawKeypoints();
+  // drawSkeleton();
+  logChanges();
+  handleJump();
   window.requestAnimationFrame(drawCameraIntoCanvas);
 }
 // Loop over the drawCameraIntoCanvas function
@@ -64,12 +66,40 @@ function drawKeypoints() {
     for (let j = 0; j < poses[i].pose.keypoints.length; j += 1) {
       let keypoint = poses[i].pose.keypoints[j];
       // Only draw an ellipse is the pose probability is bigger than 0.2
-      if (keypoint.score > 0.2) {
+      if (keypoint.score > 0.3) {
         ctx.strokeStyle = "blue"; // You can use any valid CSS color here
         ctx.beginPath();
         ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
         ctx.stroke();
       }
+    }
+  }
+}
+
+// A function to draw ellipses over the detected keypoints
+function logChanges() {
+  // Loop through all the poses detected
+  for (let i = 0; i < poses.length; i += 1) {
+    // console.log(poses[0].pose.keypoints[0]);
+    // For each pose detected, loop through all the keypoints
+    for (let j = 0; j < poses[i].pose.keypoints.length; j += 1) {
+      let keypoint = poses[i].pose.keypoints[j];
+      // Only draw an ellipse is the pose probability is bigger than 0.2
+      if (keypoint.score > 0.3) {
+        ctx.strokeStyle = "yellow"; // You can use any valid CSS color here
+        ctx.beginPath();
+        ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
+    }
+    for (let j = 0; j < poses[i].skeleton.length; j += 1) {
+      let partA = poses[i].skeleton[j][0];
+      let partB = poses[i].skeleton[j][1];
+      ctx.strokeStyle = "red"; // You can use any valid CSS color here
+      ctx.beginPath();
+      ctx.moveTo(partA.position.x, partA.position.y);
+      ctx.lineTo(partB.position.x, partB.position.y);
+      ctx.stroke();
     }
   }
 }
@@ -88,5 +118,17 @@ function drawSkeleton() {
       ctx.lineTo(partB.position.x, partB.position.y);
       ctx.stroke();
     }
+  }
+}
+
+function handleJump() {
+  if (poses.length > 0) {
+    let rightShoulderKeypoint = poses[0].pose.keypoints[6];
+    let leftShoulderKeypoint = poses[0].pose.keypoints[5];
+
+    console.log(
+      `rY: ${rightShoulderKeypoint.position.y} \n lY: ${leftShoulderKeypoint.position.y} \n`,
+      `rX: ${rightShoulderKeypoint.position.x} \n lX: ${leftShoulderKeypoint.position.x}`
+    );
   }
 }
