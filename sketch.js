@@ -14,6 +14,13 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+// add here the global variables
+let calibratedYLine;
+let calibrateNoseLineY;
+let hasCalibrated = false; // make sure to reset this later on
+
+// Ends here
+
 // The detected positions will be inside an array
 let poses = [];
 
@@ -36,6 +43,7 @@ function drawCameraIntoCanvas() {
   // drawKeypoints();
   // drawSkeleton();
   logChanges();
+  handleCalibration();
   handleJump();
   window.requestAnimationFrame(drawCameraIntoCanvas);
 }
@@ -123,12 +131,70 @@ function drawSkeleton() {
 
 function handleJump() {
   if (poses.length > 0) {
-    let rightShoulderKeypoint = poses[0].pose.keypoints[6];
-    let leftShoulderKeypoint = poses[0].pose.keypoints[5];
+    // let rightShoulderKeypoint = poses[0].pose.keypoints[6];
+    // let leftShoulderKeypoint = poses[0].pose.keypoints[5];
 
-    console.log(
-      `rY: ${rightShoulderKeypoint.position.y} \n lY: ${leftShoulderKeypoint.position.y} \n`,
-      `rX: ${rightShoulderKeypoint.position.x} \n lX: ${leftShoulderKeypoint.position.x}`
-    );
+    // console.log(
+    //   `rY: ${rightShoulderKeypoint.position.y} \n lY: ${leftShoulderKeypoint.position.y} \n`,
+    //   `rX: ${rightShoulderKeypoint.position.x} \n lX: ${leftShoulderKeypoint.position.x}`
+    // );
+
+    // Get the position of the person's head and feet
+    if (
+      poses[0].pose.keypoints[0].position.x >= 100 &&
+      poses[0].pose.keypoints[0].position.x <= 550
+    ) {
+      // test start
+      let keypoint = poses[0].pose.keypoints[0];
+      if (keypoint.score > 0.3) {
+        ctx.strokeStyle = "blue"; // You can use any valid CSS color here
+        ctx.beginPath();
+        ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
+        ctx.stroke();
+      }
+      // test end
+      let headY = poses[0].pose.keypoints[0].position.y;
+      console.log(`nose Y axis: ${headY}`);
+
+      // Detect a jump if the person's height is greater than 1.5 times their normal height
+      const jumpDetected = calibrateNoseLineY > headY + 70;
+
+      // Detect a crouch if the person's height is less than 0.5 times their normal height
+      const crouchDetected = calibrateNoseLineY < headY - 70;
+
+      if (jumpDetected) {
+        console.log("jump");
+      } else if (crouchDetected) {
+        console.log("crouch");
+      }
+
+      console.log(poses[0].pose.keypoints[0].position.x);
+      console.log(calibrateNoseLineY);
+    }
   }
+}
+
+async function handleCalibration() {
+  try {
+    if (!hasCalibrated) {
+      setTimeout(getPositionY, 7000);
+      hasCalibrated = true;
+    }
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+function getPositionY() {
+  let leftShoulderKeypoint = poses[0].pose.keypoints[5];
+  let rightShoulderKeypoint = poses[0].pose.keypoints[6];
+
+  yAxixLeftShoulderLine = leftShoulderKeypoint.position.y;
+  yAxisRightShoulderLine = rightShoulderKeypoint.position.y;
+  yAxixNoseLine = poses[0].pose.keypoints[0].position.y;
+  calibrateNoseLineY = yAxixNoseLine;
+
+  calibratedYLine = (yAxixLeftShoulderLine + yAxisRightShoulderLine) / 2;
+  console.log(calibrateNoseLineY);
+  console.log(`Calibrated Y ${calibratedYLine}`);
 }
