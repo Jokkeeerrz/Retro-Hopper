@@ -168,7 +168,7 @@ function handleJump() {
         console.log("crouch");
       }
 
-      console.log(poses[0].pose.keypoints[0].position.x);
+      // console.log(poses[0].pose.keypoints[0].position.x);
       console.log(calibrateNoseLineY);
     }
   }
@@ -197,4 +197,8 @@ function getPositionY() {
   calibratedYLine = (yAxixLeftShoulderLine + yAxisRightShoulderLine) / 2;
   console.log(calibrateNoseLineY);
   console.log(`Calibrated Y ${calibratedYLine}`);
+}
+
+function restartCalibration() {
+  hasCalibrated = false;
 }
