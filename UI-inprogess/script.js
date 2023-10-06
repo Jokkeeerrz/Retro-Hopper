@@ -1,6 +1,10 @@
 import { updateGround, setupGround } from "./ground.js";
 import { updateDino, setupDino, getDinoRect, setDinoLose } from "./dino.js";
-import { updateCactus, setupCactus, getCactusRects } from "./cactus.js";
+import {
+  updateObstacles,
+  setupObstacles,
+  getObstacleRects,
+} from "./obstacles.js";
 
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 30;
@@ -27,7 +31,7 @@ function update(time) {
 
   updateGround(delta, speedScale);
   updateDino(delta, speedScale);
-  updateCactus(delta, speedScale);
+  updateObstacles(delta, speedScale);
   updateSpeedScale(delta);
   updateScore(delta);
   if (checkLose()) return handleLose();
@@ -38,7 +42,7 @@ function update(time) {
 
 function checkLose() {
   const dinoRect = getDinoRect();
-  return getCactusRects().some((rect) => isCollision(rect, dinoRect));
+  return getObstacleRects().some((rect) => isCollision(rect, dinoRect));
 }
 
 function isCollision(rect1, rect2) {
@@ -65,7 +69,7 @@ function handleStart() {
   score = 0;
   setupGround();
   setupDino();
-  setupCactus();
+  setupObstacles();
   startScreenElem.classList.add("hide");
   window.requestAnimationFrame(update);
 }

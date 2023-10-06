@@ -1,6 +1,6 @@
 let canvas;
 
-export const detectedJump = true;
+export const detectedJump = false;
 export const detectedCrouch = false;
 
 document.addEventListener("DOMContentLoaded", () => {
