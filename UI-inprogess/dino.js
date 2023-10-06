@@ -14,16 +14,118 @@ const GRAVITY = 0.0012;
 const DINO_FRAME_COUNT = 2;
 const FRAME_TIME = 100;
 
+let duckFrame = 0;
+let lastDuckFrameTime = 0;
+const DUCK_FRAME_TIME = 100;
+
 let hasCalibrated;
 let isJumping = false;
-let isCrouching = false;
 let dinoFrame;
 let currentFrameTime;
 let yVelocity;
+let isDucking = false;
 
 let calibratedYLine;
 
 let poses = [];
+
+
+export function setupDino() {
+  isJumping = false;
+  isDucking = false;
+  dinoFrame = 0;
+  currentFrameTime = 0;
+  yVelocity = 0;
+  setCustomProperty(dinoElem, "--bottom", 0);
+  document.removeEventListener("keydown", onJump);
+  document.addEventListener("keydown", onJump);
+  document.removeEventListener("keydown", onDuck);
+  document.addEventListener("keydown", onDuck);
+}
+
+export function updateDino(delta, speedScale) {
+  handleRun(delta, speedScale);
+  handleJump(delta);
+  handleDuck();
+}
+
+export function getDinoRect() {
+  return dinoElem.getBoundingClientRect();
+}
+
+export function setDinoLose() {
+  dinoElem.src = "imgs/dino-lose.PNG";
+  setCustomProperty(dinoElem, "--bottom", "0");
+}
+
+function handleDuck() {
+  if (isDucking && !isJumping) {
+    dinoElem.src = "imgs/duck-animation-cropped.PNG";
+    setCustomProperty(dinoElem, "--bottom", "-8");
+  }
+}
+
+function handleRun(delta, speedScale) {
+  if (isJumping) {
+    dinoElem.src = `imgs/dino-stationary.PNG`;
+    return;
+  }
+
+  if (isDucking) {
+    dinoElem.src = `imgs/duck-animation-cropped.PNG`;
+    return;
+  }
+
+  // swaps between 2 pictures
+  if (currentFrameTime >= FRAME_TIME) {
+    dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT; // ranges between 0 and 1
+    dinoElem.src = `imgs/dino-run-${dinoFrame}.PNG`;
+    currentFrameTime -= FRAME_TIME;
+  }
+
+  currentFrameTime += delta * speedScale;
+}
+
+function handleJump(delta) {
+  if (!isJumping) return;
+
+  incrementCustomProperty(dinoElem, "--bottom", yVelocity * delta);
+
+  if (getCustomProperty(dinoElem, "--bottom") <= 0) {
+    setCustomProperty(dinoElem, "--bottom", 0);
+    isJumping = false;
+  }
+
+  yVelocity -= GRAVITY * delta;
+}
+
+function onJump() {
+  if (isJumping) return;
+
+  yVelocity = JUMP_SPEED;
+  isJumping = true;
+}
+
+// function onReleaseDuck() {
+//   if (isDucking) return;
+
+//   if (!isJumping) {
+//     isDucking = false;
+//     dinoElem.src = `imgs/dino-run-${dinoFrame}.PNG`;
+//     setCustomProperty(dinoElem, "--bottom", "0");
+//   }
+// }
+
+function onDuck() {
+  if (isDucking) return;
+
+  if (!isJumping) {
+    isDucking = true;
+    dinoElem.src = "imgs/duck-animation-cropped.PNG";
+    setCustomProperty(dinoElem, "--bottom", "0");
+  }
+}
+
 
 // Create a webcam capture
 if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -79,8 +181,13 @@ export function gotPoses(results) {
         onJump();
         console.log("jump");
       } else if (crouchDetected) {
-        onCrouch();
+        onDuck();
         console.log("crouch");
+      } else {
+        isDucking = false;
+        if (!isJumping) {
+          setCustomProperty(dinoElem, "--bottom", "0");
+        }
       }
 
       ctx.strokeStyle = "red"; // You can use any valid CSS color here
@@ -115,89 +222,6 @@ export function getPositionY() {
   calibratedYLine = (leftShoulderKeypoint + rightShoulderKeypoint) / 2;
 
   console.log(`Calibrated Y ${calibratedYLine}`);
-}
-
-export function setupDino() {
-  isJumping = false;
-  isCrouching = false;
-  dinoFrame = 0;
-  currentFrameTime = 0;
-  yVelocity = 0;
-  setCustomProperty(dinoElem, "--bottom", 0);
-  document.removeEventListener("keydown", onJump);
-  document.addEventListener("keydown", onJump);
-  document.removeEventListener("keydown", onCrouch);
-  document.addEventListener("keydown", onCrouch);
-}
-
-export function updateDino(delta, speedScale) {
-  handleRun(delta, speedScale);
-  handleJump(delta);
-  handleCrouch(delta, speedScale);
-}
-
-export function getDinoRect() {
-  return dinoElem.getBoundingClientRect();
-}
-
-export function setDinoLose() {
-  dinoElem.src = "imgs/dino-lose.PNG";
-}
-
-function handleRun(delta, speedScale) {
-  if (isJumping) {
-    dinoElem.src = `imgs/dino-stationary.PNG`;
-    return;
-  }
-
-  if (isCrouching) {
-    dinoElem.src = `imgs/dino-crouch.PNG`;
-    return;
-  }
-
-  // swaps between 2 pictures
-  if (currentFrameTime >= FRAME_TIME) {
-    dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT; // ranges between 0 and 1
-    dinoElem.src = `imgs/dino-run-${dinoFrame}.PNG`;
-    currentFrameTime -= FRAME_TIME;
-  }
-
-  currentFrameTime += delta * speedScale;
-}
-
-function handleJump(delta) {
-  if (!isJumping) return;
-
-  incrementCustomProperty(dinoElem, "--bottom", yVelocity * delta);
-
-  if (getCustomProperty(dinoElem, "--bottom") <= 0) {
-    setCustomProperty(dinoElem, "--bottom", 0);
-    isJumping = false;
-  }
-
-  yVelocity -= GRAVITY * delta;
-}
-
-function handleCrouch() {
-  if (!isCrouching) return;
-
-  incrementCustomProperty(dinoElem, "--bottom", yVelocity * delta);
-
-  yVelocity -= GRAVITY * delta;
-}
-
-// I want to make the code communicate with the postnet model
-function onCrouch() {
-  if (isCrouching) return;
-
-  isCrouching = true;
-}
-
-function onJump() {
-  if (isJumping) return;
-
-  yVelocity = JUMP_SPEED;
-  isJumping = true;
 }
 
 function logChanges() {

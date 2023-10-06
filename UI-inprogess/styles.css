@@ -68,6 +68,6 @@ body {
 .obstacle-flying {
   position: absolute;
   left: calc(var(--left) * 1%);
-  top: calc(var(--top) * 100%);
+  top: calc(var(--top) * 85%);
   height: 30%;
 }
