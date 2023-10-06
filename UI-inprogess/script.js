@@ -9,10 +9,27 @@ const SPEED_SCALE_INCREASE = 0.00001;
 const worldElem = document.querySelector("[data-world]");
 const scoreElem = document.querySelector("[data-score]");
 const startScreenElem = document.querySelector("[data-start-screen]");
+const backgroundMusic = document.getElementById('background-music');
+const lose = 'audio/vibrating-thud-39536.mp3'
 
 setPixelToWorldScale();
 window.addEventListener("resize", setPixelToWorldScale);
 document.addEventListener("keydown", handleStart, { once: true });
+
+function playBackgroundMusic() {
+  backgroundMusic.play();
+}
+
+function pauseBackgroundMusic() {
+  backgroundMusic.pause();
+}
+
+function setVolume(volume) {
+  backgroundMusic.volume = volume;
+}
+
+setVolume(0.2);
+playBackgroundMusic();
 
 let lastTime;
 let speedScale;
@@ -68,14 +85,22 @@ function handleStart() {
   setupCactus();
   startScreenElem.classList.add("hide");
   window.requestAnimationFrame(update);
+
+  playBackgroundMusic();
 }
 
 function handleLose() {
   setDinoLose();
+
+  const loseSFX = new Audio(lose)
+  loseSFX.play();
+
   setTimeout(() => {
     document.addEventListener("keydown", handleStart, { once: true });
     startScreenElem.classList.remove("hide");
   }, 100);
+
+  pauseBackgroundMusic();
 }
 
 function setPixelToWorldScale() {

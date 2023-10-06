@@ -9,6 +9,8 @@ const JUMP_SPEED = 0.45;
 const GRAVITY = 0.0015;
 const DINO_FRAME_COUNT = 2;
 const FRAME_TIME = 100;
+const footstep = 'audio/footstep3.mp3';
+const jump = 'audio/jump-sfx.mp3';
 
 let isJumping;
 let dinoFrame;
@@ -49,6 +51,9 @@ function handleRun(delta, speedScale) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT; // ranges between 0 and 1
     dinoElem.src = `imgs/dino-run-${dinoFrame}.PNG`;
     currentFrameTime -= FRAME_TIME;
+
+    const audioRun = new Audio(footstep);
+    audioRun.play();
   }
 
   currentFrameTime += delta * speedScale;
@@ -72,4 +77,7 @@ function onJump(e) {
 
   yVelocity = JUMP_SPEED;
   isJumping = true;
+
+  const audioJump = new Audio(jump);
+  audioJump.play();
 }
