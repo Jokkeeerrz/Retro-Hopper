@@ -8,6 +8,7 @@ const SPEED = 0.05;
 const OBSTACLE_INTERVAL_MIN = 1500;
 const OBSTACLE_INTERVAL_MAX = 2500;
 const worldElem = document.querySelector("[data-world]");
+const flyingObstacleSFX = 'audio/roar-8-bit.mp3'
 
 let nextObstacleTime;
 
@@ -64,6 +65,9 @@ function createRandomObstacle() {
     createGroundObstacle();
   } else {
     createFlyingObstacle();
+
+    const flySFX = new Audio(flyingObstacleSFX);
+    flySFX.play();
   }
 }
 
