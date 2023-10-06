@@ -174,6 +174,9 @@ function handleJump() {
   }
 }
 
+// width="640"
+// height="480"
+
 async function handleCalibration() {
   try {
     if (!hasCalibrated) {
@@ -191,8 +194,8 @@ function getPositionY() {
 
   yAxixLeftShoulderLine = leftShoulderKeypoint.position.y;
   yAxisRightShoulderLine = rightShoulderKeypoint.position.y;
-  yAxixNoseLine = poses[0].pose.keypoints[0].position.y;
-  calibrateNoseLineY = yAxixNoseLine;
+  yAxisNoseLine = poses[0].pose.keypoints[0].position.y;
+  calibrateNoseLineY = yAxisNoseLine;
 
   calibratedYLine = (yAxixLeftShoulderLine + yAxisRightShoulderLine) / 2;
   console.log(calibrateNoseLineY);
