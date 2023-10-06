@@ -88,3 +88,11 @@ body {
   height: 30%;
   bottom: 0;
 }
+
+/* canvas {
+  display: none;
+} */
+
+video {
+  display: none;
+}
