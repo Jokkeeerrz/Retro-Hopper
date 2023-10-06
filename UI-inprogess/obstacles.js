@@ -5,8 +5,8 @@ import {
 } from "./updateCustomProperty.js";
 
 const SPEED = 0.05;
-const OBSTACLE_INTERVAL_MIN = 700;
-const OBSTACLE_INTERVAL_MAX = 2000;
+const OBSTACLE_INTERVAL_MIN = 1500;
+const OBSTACLE_INTERVAL_MAX = 2500;
 const worldElem = document.querySelector("[data-world]");
 
 let nextObstacleTime;

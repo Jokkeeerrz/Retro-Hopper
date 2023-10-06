@@ -65,7 +65,7 @@ function updateScore(delta) {
 
 function handleStart() {
   lastTime = null;
-  speedScale = 1;
+  speedScale = 1.3;
   score = 0;
   setupGround();
   setupDino();
