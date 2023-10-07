@@ -71,3 +71,9 @@ body {
   top: calc(var(--top) * 85%);
   height: 30%;
 }
+
+video, canvas {
+  z-index: 1;
+  position: absolute;
+  bottom: 2000px;
+}
