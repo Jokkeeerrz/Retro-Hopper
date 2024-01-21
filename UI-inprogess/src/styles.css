@@ -40,6 +40,15 @@ body {
   justify-self: center;
 }
 
+.highscore {
+  position: absolute;
+  font-size: 5vmin;
+  right: 1vmin;
+  top: 0vmin;
+  color: white;
+  justify-self: center;
+}
+
 .start-screen {
   position: absolute;
   top: 50%;

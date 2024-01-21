@@ -12,9 +12,10 @@ const SPEED_SCALE_INCREASE = 0.00001;
 
 const worldElem = document.querySelector("[data-world]");
 const scoreElem = document.querySelector("[data-score]");
+const highestScoreElem = document.querySelector("[data-highscore]");
 const startScreenElem = document.querySelector("[data-start-screen]");
-const backgroundMusic = document.getElementById('background-music');
-const lose = '../audio/vibrating-thud-39536.mp3'
+const backgroundMusic = document.getElementById("background-music");
+const lose = "../audio/vibrating-thud-39536.mp3";
 
 setPixelToWorldScale();
 window.addEventListener("resize", setPixelToWorldScale);
@@ -38,6 +39,7 @@ playBackgroundMusic();
 let lastTime;
 let speedScale;
 let score;
+
 function update(time) {
   if (lastTime == null) {
     lastTime = time;
@@ -59,6 +61,7 @@ function update(time) {
 
 function checkLose() {
   const dinoRect = getDinoRect();
+
   return getObstacleRects().some((rect) => isCollision(rect, dinoRect));
 }
 
@@ -87,6 +90,11 @@ function handleStart() {
   setupGround();
   setupDino();
   setupObstacles();
+
+  if (getHighScore() > 0) {
+    highestScoreElem.textContent = `Highest Score: ${getHighScore()}`;
+  }
+
   startScreenElem.classList.add("hide");
   window.requestAnimationFrame(update);
 
@@ -96,8 +104,9 @@ function handleStart() {
 function handleLose() {
   setDinoLose();
 
-  const loseSFX = new Audio(lose)
+  const loseSFX = new Audio(lose);
   loseSFX.play();
+  storeScore();
 
   setTimeout(() => {
     document.addEventListener("keydown", handleStart, { once: true });
@@ -117,4 +126,43 @@ function setPixelToWorldScale() {
 
   worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`;
   worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`;
+}
+
+function storeScore() {
+  const getScore = Math.floor(score);
+  console.log(getScore);
+
+  const storedScoreJSON = localStorage.getItem("Score");
+  let storedScore = [];
+
+  if (storedScoreJSON) {
+    storedScore = JSON.parse(storedScoreJSON);
+  }
+
+  storedScore.push(getScore);
+
+  const scoreJSON = JSON.stringify(storedScore);
+  localStorage.setItem("Score", scoreJSON);
+
+  console.log(localStorage);
+
+  getHighScore();
+}
+
+function getHighScore() {
+  const storedScoreJSON = localStorage.getItem("Score");
+  let storedScore = [];
+
+  if (storedScoreJSON) {
+    storedScore = JSON.parse(storedScoreJSON);
+  }
+
+  let highestScore = Math.max(...storedScore);
+
+  if (highestScore <= 0) {
+    return;
+  }
+
+  console.log(highestScore);
+  return highestScore;
 }
