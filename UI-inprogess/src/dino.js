@@ -19,11 +19,7 @@ const jump = "../audio/jump-sfx.mp3";
 const audioJump = new Audio(jump);
 const audioRun = new Audio(footstep);
 
-let duckFrame = 0;
-let lastDuckFrameTime = 0;
-const DUCK_FRAME_TIME = 100;
-
-let hasCalibrated;
+let isCalibrated = false;
 let isJumping = false;
 let dinoFrame;
 let currentFrameTime;
@@ -31,8 +27,6 @@ let yVelocity;
 let isDucking = false;
 
 let calibratedYLine;
-
-let poses = [];
 
 export function setupDino() {
   isJumping = false;
@@ -134,62 +128,103 @@ function onDuck() {
   }
 }
 
-// Create a webcam capture
-if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-  navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-    video.srcObject = stream;
-    video.play();
+async function setupCamera() {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+
+  return new Promise((resolve) => {
+    video.onloadedmetadata = () => {
+      resolve(video);
+    };
   });
 }
 
-export function drawCameraIntoCanvas() {
-  ctx.drawImage(video, 0, 0, 640, 480);
-  gotPoses(poses);
-  logChanges();
-  handleCalibration();
-  window.requestAnimationFrame(drawCameraIntoCanvas);
+const skeleton = [
+  { from: "left_hip", to: "left_shoulder" },
+  { from: "left_elbow", to: "left_shoulder" },
+  { from: "left_elbow", to: "left_wrist" },
+  { from: "left_hip", to: "left_knee" },
+  { from: "left_knee", to: "left_ankle" },
+  { from: "right_hip", to: "right_shoulder" },
+  { from: "right_elbow", to: "right_shoulder" },
+  { from: "right_elbow", to: "right_wrist" },
+  { from: "right_hip", to: "right_knee" },
+  { from: "right_knee", to: "right_ankle" },
+  { from: "left_shoulder", to: "right_shoulder" },
+  { from: "left_hip", to: "right_hip" },
+];
+
+async function runInference() {
+  await setupCamera();
+
+  const movenet = await poseDetection.createDetector(
+    poseDetection.SupportedModels.MoveNet,
+    { modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER }
+  );
+
+  async function detectPose() {
+    const poses = await movenet.estimatePoses(video, {
+      flipHorizontal: false,
+      maxPoses: 1,
+    });
+
+    // console.log(poses[0].keypoints);
+    if (poses) {
+      gotPoses(poses);
+      drawKeypoints(poses);
+      handleCalibration(poses);
+    }
+
+    requestAnimationFrame(detectPose);
+  }
+
+  function drawKeypoints(poses) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const pose of poses) {
+      // Draw keypoints
+      for (const keypoint of pose.keypoints) {
+        if (keypoint.score > 0.3) {
+          ctx.fillStyle = "yellow";
+          ctx.beginPath();
+          ctx.arc(keypoint.x, keypoint.y, 5, 0, 2 * Math.PI);
+          ctx.fill();
+        }
+      }
+
+      // Draw skeleton lines
+      skeleton.forEach((bone) => {
+        const startPoint = pose.keypoints.find(
+          (point) => point.name === bone.from
+        );
+        const endPoint = pose.keypoints.find((point) => point.name === bone.to);
+        if (startPoint.score > 0.3 && endPoint.score > 0.3) {
+          ctx.fillStyle = "blue";
+          ctx.beginPath();
+          ctx.moveTo(startPoint.x, startPoint.y);
+          ctx.lineTo(endPoint.x, endPoint.y);
+          ctx.stroke();
+        }
+      });
+    }
+  }
+  detectPose();
 }
-// Loop over the drawCameraIntoCanvas function
-drawCameraIntoCanvas();
 
-let posenetoptions = {
-  imageScaleFactor: 0.3,
-  outputStride: 16,
-  flipHorizontal: false,
-  minConfidence: 0.8,
-  maxPoseDetections: 1, //detect only single pose
-  scoreThreshold: 0.5,
-  nmsRadius: 20,
-  detectionType: "single", //detect only single pose
-  multiplier: 0.75,
-};
+runInference();
 
-export const poseNet = ml5.poseNet(video, posenetoptions, "single", modelReady);
-poseNet.on("pose", gotPoses);
+export function gotPoses(poses) {
+  if (
+    poses.length > 0 &&
+    poses[0].keypoints &&
+    poses[0].keypoints[5] &&
+    poses[0].keypoints[6]
+  ) {
+    let leftShouldLocation = poses[0].keypoints[5].y;
+    let rightShouldLocation = poses[0].keypoints[6].y;
 
-export function gotPoses(results) {
-  poses = results;
-  if (poses.length > 0) {
-    // if (
-    //   poses[0].pose.keypoints[0].position.x >= 200 &&
-    //   poses[0].pose.keypoints[0].position.x <= 450
-    // ) {
-    // test start
-    // let keypoint = poses[0].pose.keypoints[0];
-    // if (keypoint.score > 0.3) {
-    //   ctx.strokeStyle = "red"; // You can use any valid CSS color here
-    //   ctx.beginPath();
-    //   ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
-    //   ctx.stroke();
-    // }
-    // test end
-    let currleftShoulderKeypoint = poses[0].pose.keypoints[5].position.y;
-    let currrightShoulderKeypoint = poses[0].pose.keypoints[6].position.y;
-
-    let currShoulderYLine =
-      (currleftShoulderKeypoint + currrightShoulderKeypoint) / 2;
-    console.log(`calibrated Y axis: ${calibratedYLine}`);
-    console.log(`current shoulder y axis: ${currShoulderYLine}`);
+    let currShoulderYLine = (leftShouldLocation + rightShouldLocation) / 2;
+    // console.log(`calibrated Y axis: ${calibratedYLine}`);
+    // console.log(`current shoulder y axis: ${currShoulderYLine}`);
 
     // Detect a jump if the person's height is greater than 1.5 times their normal height
     const jumpDetected = currShoulderYLine < calibratedYLine - 50;
@@ -210,64 +245,42 @@ export function gotPoses(results) {
       }
     }
 
-    ctx.strokeStyle = "red"; // You can use any valid CSS color here
+    ctx.strokeStyle = "yellow"; // You can use any valid CSS color here
     ctx.beginPath();
     ctx.moveTo(0, calibratedYLine);
     ctx.lineTo(640, calibratedYLine);
     ctx.stroke();
+  } else {
+    console.log("Missing Pose Location");
   }
-  // }
 }
 
-export function modelReady() {
-  console.log("model ready");
-  poseNet.multiPose(video);
-  console.log(poseNet.singlePose(video));
-}
-
-export async function handleCalibration() {
+export async function handleCalibration(poses) {
   try {
-    if (!hasCalibrated) {
-      setTimeout(getPositionY, 3000);
-      hasCalibrated = true;
+    if (!isCalibrated) {
+      setTimeout(getPositionY(poses), 3000);
+      isCalibrated = true;
     }
   } catch (error) {
     console.log(error);
   }
 }
 
-export function getPositionY() {
-  let leftShoulderKeypoint = poses[0].pose.keypoints[5].position.y;
-  let rightShoulderKeypoint = poses[0].pose.keypoints[6].position.y;
+export function getPositionY(poses) {
+  if (
+    poses &&
+    poses.length > 0 &&
+    poses[0].keypoints &&
+    poses[0].keypoints[5] &&
+    poses[0].keypoints[6]
+  ) {
+    console.log("Calibrated now");
+    let leftShoulderKeypoint = poses[0].keypoints[5].y;
+    let rightShoulderKeypoint = poses[0].keypoints[6].y;
+    console.log(leftShoulderKeypoint, rightShoulderKeypoint);
 
-  calibratedYLine = (leftShoulderKeypoint + rightShoulderKeypoint) / 2;
+    calibratedYLine = (leftShoulderKeypoint + rightShoulderKeypoint) / 2;
+  }
 
   console.log(`Calibrated Y ${calibratedYLine}`);
-}
-
-function logChanges() {
-  // Loop through all the poses detected
-  for (let i = 0; i < poses.length; i += 1) {
-    console.log(poses[0].pose.keypoints[0]);
-    // For each pose detected, loop through all the keypoints
-    for (let j = 0; j < poses[i].pose.keypoints.length; j += 1) {
-      let keypoint = poses[i].pose.keypoints[j];
-      // Only draw an ellipse if the pose probability is bigger than 0.2
-      if (keypoint.score > 0.3) {
-        ctx.strokeStyle = "yellow"; // You can use any valid CSS color here
-        ctx.beginPath();
-        ctx.arc(keypoint.position.x, keypoint.position.y, 10, 0, 2 * Math.PI);
-        ctx.stroke();
-      }
-    }
-    for (let j = 0; j < poses[i].skeleton.length; j += 1) {
-      let partA = poses[i].skeleton[j][0];
-      let partB = poses[i].skeleton[j][1];
-      ctx.strokeStyle = "white"; // You can use any valid CSS color here
-      ctx.beginPath();
-      ctx.moveTo(partA.position.x, partA.position.y);
-      ctx.lineTo(partB.position.x, partB.position.y);
-      ctx.stroke();
-    }
-  }
 }

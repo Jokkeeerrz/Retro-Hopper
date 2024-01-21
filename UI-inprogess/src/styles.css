@@ -17,9 +17,18 @@ body {
   background-size: cover;
 }
 
+#video {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 130px;
+  width: 100%;
+}
+
 .world {
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
+  height: 1000px;
 }
 
 .score {
