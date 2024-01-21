@@ -258,7 +258,7 @@ export function gotPoses(poses) {
 export async function handleCalibration(poses) {
   try {
     if (!isCalibrated) {
-      setTimeout(getPositionY(poses), 3000);
+      setTimeout(getPositionY(poses), 1000);
       isCalibrated = true;
     }
   } catch (error) {

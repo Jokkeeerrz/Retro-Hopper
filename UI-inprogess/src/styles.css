@@ -23,6 +23,7 @@ body {
   right: 0;
   height: 130px;
   width: 100%;
+  object-fit: contain;
 }
 
 .world {
@@ -36,15 +37,6 @@ body {
   font-size: 5vmin;
   right: 1vmin;
   top: 1vmin;
-  color: white;
-  justify-self: center;
-}
-
-.highscore {
-  position: absolute;
-  font-size: 5vmin;
-  right: 1vmin;
-  top: 0vmin;
   color: white;
   justify-self: center;
 }
