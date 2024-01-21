@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Retro Hopper</title>
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" type="module"></script>
     <script type="module" src="dino.js"></script>
-    <script src="../posenet.js"></script>
+    <script src="../../posenet.js"></script>
   </head>
   <body>
     <canvas id="canvas" width="640" height="480"></canvas>
@@ -20,15 +20,15 @@
     ></video>
     <div class="world" data-world>
       <audio id="background-music" loop>
-        <source src="audio/bgmusic2.mp3" type="audio/mpeg">
+        <source src="../audio/bgmusic2.mp3" type="audio/mpeg" />
       </audio>
       <div class="score" data-score>0</div>
       <div class="start-screen" data-start-screen>
-        <img src="imgs/start-screen.gif" class="background" />
+        <img src="../imgs/start-screen.gif" class="background" />
       </div>
-      <img src="imgs/ground.png" class="ground" data-ground />
-      <img src="imgs/ground.png" class="ground" data-ground />
-      <img src="imgs/dino-stationary.png" class="dino" data-dino />
+      <img src="../imgs/ground.png" class="ground" data-ground />
+      <img src="../imgs/ground.png" class="ground" data-ground />
+      <img src="../imgs/dino-stationary.png" class="dino" data-dino />
     </div>
   </body>
 </html>

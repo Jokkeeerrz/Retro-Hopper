@@ -14,7 +14,7 @@ const worldElem = document.querySelector("[data-world]");
 const scoreElem = document.querySelector("[data-score]");
 const startScreenElem = document.querySelector("[data-start-screen]");
 const backgroundMusic = document.getElementById('background-music');
-const lose = 'audio/vibrating-thud-39536.mp3'
+const lose = '../audio/vibrating-thud-39536.mp3'
 
 setPixelToWorldScale();
 window.addEventListener("resize", setPixelToWorldScale);
