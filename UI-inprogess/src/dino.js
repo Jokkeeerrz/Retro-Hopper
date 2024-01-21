@@ -228,7 +228,7 @@ export function modelReady() {
 export async function handleCalibration() {
   try {
     if (!hasCalibrated) {
-      setTimeout(getPositionY, 7000);
+      setTimeout(getPositionY, 3000);
       hasCalibrated = true;
     }
   } catch (error) {
