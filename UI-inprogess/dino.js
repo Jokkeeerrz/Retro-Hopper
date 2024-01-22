@@ -13,8 +13,8 @@ const JUMP_SPEED = 0.45;
 const GRAVITY = 0.0012;
 const DINO_FRAME_COUNT = 2;
 const FRAME_TIME = 100;
-const footstep = "../audio/footstep3.mp3";
-const jump = "../audio/jump-sfx.mp3";
+const footstep = "./audio/footstep3.mp3";
+const jump = "./audio/jump-sfx.mp3";
 
 const audioJump = new Audio(jump);
 const audioRun = new Audio(footstep);
@@ -52,32 +52,32 @@ export function getDinoRect() {
 }
 
 export function setDinoLose() {
-  dinoElem.src = "../imgs/dino-lose.PNG";
+  dinoElem.src = "./imgs/dino-lose.PNG";
   setCustomProperty(dinoElem, "--bottom", "0");
 }
 
 function handleDuck() {
   if (isDucking && !isJumping) {
-    dinoElem.src = "../imgs/duck-animation-cropped.PNG";
+    dinoElem.src = "./imgs/duck-animation-cropped.PNG";
     setCustomProperty(dinoElem, "--bottom", "-8");
   }
 }
 
 function handleRun(delta, speedScale) {
   if (isJumping) {
-    dinoElem.src = `../imgs/dino-stationary.PNG`;
+    dinoElem.src = `./imgs/dino-stationary.PNG`;
     return;
   }
 
   if (isDucking) {
-    dinoElem.src = `../imgs/duck-animation-cropped.PNG`;
+    dinoElem.src = `./imgs/duck-animation-cropped.PNG`;
     return;
   }
 
   // swaps between 2 pictures
   if (currentFrameTime >= FRAME_TIME) {
     dinoFrame = (dinoFrame + 1) % DINO_FRAME_COUNT; // ranges between 0 and 1
-    dinoElem.src = `../imgs/dino-run-${dinoFrame}.PNG`;
+    dinoElem.src = `./imgs/dino-run-${dinoFrame}.PNG`;
     currentFrameTime -= FRAME_TIME;
 
     audioRun.play();
@@ -123,7 +123,7 @@ function onDuck() {
 
   if (!isJumping) {
     isDucking = true;
-    dinoElem.src = "../imgs/duck-animation-cropped.PNG";
+    dinoElem.src = "./imgs/duck-animation-cropped.PNG";
     setCustomProperty(dinoElem, "--bottom", "0");
   }
 }

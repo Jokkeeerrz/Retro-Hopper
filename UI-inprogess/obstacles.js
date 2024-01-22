@@ -8,7 +8,7 @@ const SPEED = 0.05;
 const OBSTACLE_INTERVAL_MIN = 1500;
 const OBSTACLE_INTERVAL_MAX = 2500;
 const worldElem = document.querySelector("[data-world]");
-const flyingObstacleSFX = "../audio/roar-8-bit.mp3";
+const flyingObstacleSFX = "./audio/roar-8-bit.mp3";
 
 let nextObstacleTime;
 
@@ -47,16 +47,16 @@ export function getObstacleRects() {
 }
 
 const groundObstacleSprites = [
-  "../imgs/obstacles/ground/obstacle1.png",
-  "../imgs/obstacles/ground/obstacle2.png",
-  "../imgs/obstacles/ground/obstacle3.png",
+  "./imgs/obstacles/ground/obstacle1.png",
+  "./imgs/obstacles/ground/obstacle2.png",
+  "./imgs/obstacles/ground/obstacle3.png",
 ];
 
 const flyingObstacleSprites = [
-  "../imgs/obstacles/flying/obstacle1.png",
-  "../imgs/obstacles/flying/obstacle2.png",
-  "../imgs/obstacles/flying/obstacle3.png",
-  "../imgs/obstacles/flying/obstacle4.png",
+  "./imgs/obstacles/flying/obstacle1.png",
+  "./imgs/obstacles/flying/obstacle2.png",
+  "./imgs/obstacles/flying/obstacle3.png",
+  "./imgs/obstacles/flying/obstacle4.png",
 ];
 
 function createRandomObstacle() {

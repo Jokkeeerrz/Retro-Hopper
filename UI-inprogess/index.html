@@ -9,8 +9,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/pose-detection"></script>
-    <script src="script.js" type="module"></script>
-    <script type="module" src="dino.js"></script>
+    <script src="./script.js" type="module"></script>
+    <script type="module" src="./dino.js"></script>
   </head>
   <div class="highscore" data-highscore>Highest Score:</div>
   <body>
@@ -19,15 +19,15 @@
       <canvas id="canvas" width="640" height="480"></canvas>
 
       <audio id="background-music" loop>
-        <source src="../audio/bgmusic2.mp3" type="audio/mpeg" />
+        <source src="./audio/bgmusic2.mp3" type="audio/mpeg" />
       </audio>
       <div class="score" data-score>0</div>
       <div class="start-screen" data-start-screen>
-        <img src="../imgs/start-screen.gif" class="background" />
+        <img src="./imgs/start-screen.gif" class="background" />
       </div>
-      <img src="../imgs/ground.png" class="ground" data-ground />
-      <img src="../imgs/ground.png" class="ground" data-ground />
-      <img src="../imgs/dino-stationary.png" class="dino" data-dino />
+      <img src="./imgs/ground.png" class="ground" data-ground />
+      <img src="./imgs/ground.png" class="ground" data-ground />
+      <img src="./imgs/dino-stationary.png" class="dino" data-dino />
     </div>
   </body>
 </html>
