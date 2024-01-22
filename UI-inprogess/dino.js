@@ -8,6 +8,9 @@ const video = document.getElementById("video");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
+const calibrateBtn = document.getElementById("calibrate");
+const displayCalibrationText = document.getElementById("calibrate-text");
+
 const dinoElem = document.querySelector("[data-dino]");
 const JUMP_SPEED = 0.45;
 const GRAVITY = 0.0012;
@@ -27,6 +30,8 @@ let yVelocity;
 let isDucking = false;
 
 let calibratedYLine;
+
+calibrateBtn.onclick = onRecalibrate;
 
 export function setupDino() {
   isJumping = false;
@@ -172,7 +177,7 @@ async function runInference() {
     if (poses) {
       gotPoses(poses);
       drawKeypoints(poses);
-      handleCalibration(poses);
+      if (!isCalibrated) handleCalibration(poses);
     }
 
     requestAnimationFrame(detectPose);
@@ -234,10 +239,10 @@ export function gotPoses(poses) {
 
     if (jumpDetected) {
       onJump();
-      console.log("jump");
+      // console.log("jump");
     } else if (crouchDetected) {
       onDuck();
-      console.log("crouch");
+      // console.log("crouch");
     } else {
       isDucking = false;
       if (!isJumping) {
@@ -258,7 +263,8 @@ export function gotPoses(poses) {
 export async function handleCalibration(poses) {
   try {
     if (!isCalibrated) {
-      setTimeout(getPositionY(poses), 1000);
+      setTimeout(getPositionY(poses), 3000);
+      console.log("calibrate true");
       isCalibrated = true;
     }
   } catch (error) {
@@ -274,13 +280,28 @@ export function getPositionY(poses) {
     poses[0].keypoints[5] &&
     poses[0].keypoints[6]
   ) {
-    console.log("Calibrated now");
     let leftShoulderKeypoint = poses[0].keypoints[5].y;
     let rightShoulderKeypoint = poses[0].keypoints[6].y;
-    console.log(leftShoulderKeypoint, rightShoulderKeypoint);
+    // console.log(leftShoulderKeypoint, rightShoulderKeypoint);
 
     calibratedYLine = (leftShoulderKeypoint + rightShoulderKeypoint) / 2;
+    console.log("Calibrated now");
   }
-
+  hideCalibrateText();
   console.log(`Calibrated Y ${calibratedYLine}`);
+}
+
+function onRecalibrate() {
+  isCalibrated = false;
+
+  hideCalibrateText();
+}
+
+function hideCalibrateText() {
+  displayCalibrationText.style.display = "block";
+  displayCalibrationText.textContent = "Calibrated";
+
+  setTimeout(() => {
+    displayCalibrationText.style.display = "none";
+  }, 2000);
 }

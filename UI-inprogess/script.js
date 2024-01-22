@@ -108,6 +108,10 @@ function handleLose() {
   loseSFX.play();
   storeScore();
 
+  if (getHighScore() > 0) {
+    highestScoreElem.textContent = `Highest Score: ${getHighScore()}`;
+  }
+
   setTimeout(() => {
     document.addEventListener("keydown", handleStart, { once: true });
     startScreenElem.classList.remove("hide");

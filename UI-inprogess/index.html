@@ -12,9 +12,12 @@
     <script src="./script.js" type="module"></script>
     <script type="module" src="./dino.js"></script>
   </head>
-  <div class="highscore" data-highscore>Highest Score:</div>
+
   <body>
+    <div class="highscore" data-highscore>Highest Score:</div>
     <video id="video" width="640" height="480" autoplay></video>
+    <p id="calibrate-text">Calibrating...</p>
+    <button id="calibrate" type="button">Recalibrate</button>
     <div class="world" data-world>
       <canvas id="canvas" width="640" height="480"></canvas>
 
