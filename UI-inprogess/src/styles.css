@@ -20,10 +20,10 @@ body {
 #video {
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   height: 130px;
-  width: 100%;
-  object-fit: contain;
+  width: auto;
+  object-fit: cover;
 }
 
 .world {
@@ -80,4 +80,13 @@ body {
   left: calc(var(--left) * 1%);
   top: calc(var(--top) * 85%);
   height: 30%;
+}
+
+.highscore {
+  position: absolute;
+  font-size: 5vmin;
+  right: 1vmin;
+  top: 0vmin;
+  color: white;
+  justify-self: center;
 }
